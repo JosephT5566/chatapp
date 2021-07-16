@@ -5,9 +5,10 @@ import { PREFIX } from '../utils/static';
 export default function useLocalStorage(key: string, initialValue?: any) {
 	const prefixedKey = PREFIX + key;
 	const [value, setValue] = useState(() => {
-		const jsonValue = localStorage.getItem(prefixedKey);
+		// TODO: jsonValue will be 'null' in server side
+		const jsonValue = typeof window !== 'undefined' ? localStorage.getItem(prefixedKey) : null;
 
-		if (jsonValue != null) {
+		if (jsonValue) {
 			return JSON.parse(jsonValue);
 		}
 
