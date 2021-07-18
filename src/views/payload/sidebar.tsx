@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
+import Dialog from '@material-ui/core/Dialog';
 
 import Tabs, { TabPanel } from '../../components/shared/Tabs';
 import Conversations from './conversations';
@@ -29,7 +30,16 @@ export default function Sidebar(props: { id: string }) {
 	const { id } = props;
 	const classes = useStyle();
 	const [activeKey, setActiveKey] = useState(CONVERSATION_KEY);
+	const [openDialog, setOpenDialog] = useState(false);
 	const isConversation = activeKey === CONVERSATION_KEY;
+
+	const handleOpenDialog = () => {
+		setOpenDialog(true);
+	};
+
+	const handleCloseDialog = () => {
+		setOpenDialog(false);
+	};
 
 	return (
 		<div className={classes.sidebar}>
@@ -45,7 +55,10 @@ export default function Sidebar(props: { id: string }) {
 			<div className={classes.myId}>
 				Your Id: <span>{id}</span>
 			</div>
-			<Button>New {isConversation ? 'Conversation' : 'Contact'}</Button>
+			<Button onClick={handleOpenDialog}>New {isConversation ? 'Conversation' : 'Contact'}</Button>
+			<Dialog open={openDialog} onClose={handleCloseDialog}>
+				<div>123</div>
+			</Dialog>
 		</div>
 	);
 }
