@@ -7,7 +7,7 @@ import DialogActions from '@material-ui/core/DialogActions';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import { makeStyles } from '@material-ui/core';
-import { useConversations } from '../../providers/ConversationsProvider';
+import { useContacts } from '../../providers/ContactsProvider';
 
 const useStyle = makeStyles((theme) => ({
 	errorMessage: {
@@ -16,15 +16,15 @@ const useStyle = makeStyles((theme) => ({
 	},
 }));
 
-const defaultConversation = {
+const defaultContact = {
 	id: '',
 	name: '',
 };
 
-export default function NewConversationDialog(props: { closeDialog: any }) {
+export default function NewContactDialog(props: { closeDialog: any }) {
 	const { closeDialog } = props;
 	const classes = useStyle();
-	const { createConversation } = useConversations();
+	const { createContact } = useContacts();
 
 	const validate = (values: { id: string; name: string }) => {
 		let isError = false;
@@ -48,16 +48,15 @@ export default function NewConversationDialog(props: { closeDialog: any }) {
 
 	return (
 		<>
-			<DialogTitle id="form-dialog-title">Create Conversation</DialogTitle>
+			<DialogTitle id="form-dialog-title">Create Contact</DialogTitle>
 			<DialogContent>
 				<DialogContentText>
-					To subscribe to this website, please enter your email address here. We will send updates
-					occasionally.
+					Enter ID and user name to create a new contact.
 				</DialogContentText>
 				<Formik
-					initialValues={defaultConversation}
+					initialValues={defaultContact}
 					onSubmit={(values) => {
-						createConversation(values.id, values.name);
+						createContact(values.id, values.name);
 						closeDialog();
 					}}
 					validate={validate}
