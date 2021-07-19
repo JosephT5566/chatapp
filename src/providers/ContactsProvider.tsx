@@ -1,8 +1,13 @@
 import React, { useContext, createContext, ReactNode } from 'react';
 import useLocalStorage from '../hook/useLocalStorage';
 
+type Contact = {
+	id: string;
+	name: string;
+};
+
 export type ContactContent = {
-	contacts: [];
+	contacts: Array<Contact>;
 	createContact: (id: string, name: string) => void;
 };
 
