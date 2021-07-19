@@ -7,6 +7,8 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { APP_NAME } from '../src/utils/static';
 import Sidebar from '../src/views/payload/sidebar';
+import { ConversationsProvider } from '../src/providers/ConversationsProvider';
+import { ContactsProvider } from '../src/providers/ContactsProvider';
 
 const useStyle = makeStyles((theme) => ({
 	home: {
@@ -27,7 +29,11 @@ export default function Home() {
 			</Head>
 
 			<main>
-				<Sidebar id={id}></Sidebar>
+				<ContactsProvider>
+					<ConversationsProvider>
+						<Sidebar id={id}></Sidebar>
+					</ConversationsProvider>
+				</ContactsProvider>
 			</main>
 		</div>
 	);
