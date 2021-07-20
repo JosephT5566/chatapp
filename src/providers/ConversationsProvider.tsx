@@ -2,30 +2,32 @@ import React, { useContext, createContext, ReactNode, useState } from 'react';
 import useLocalStorage from '../hook/useLocalStorage';
 import { useContacts } from './ContactsProvider';
 
-type Recipient = {
-	id: string;
-	name: string;
-};
+class Recipient {
+	id: string = '';
+	name: string = '';
+}
 
-type Conversation = {
-	recipients: string[];
-	name: string;
-};
+class Conversation {
+	recipients: string[] = [''];
+	name: string = '';
+}
 
-type FormattedConversation = {
-	recipients: Array<Recipient>;
-	name: string;
-	selected: boolean;
-};
+class FormattedConversation {
+	recipients: Array<Recipient> = [new Recipient()];
+	name: string = '';
+	selected: boolean = false;
+}
 
-export type ConversationContent = {
-	conversations: Array<FormattedConversation>;
-	selectedConversationIndex: (index: number) => void;
-	createConversation: (recipients: string[]) => void;
-};
+export class ConversationContent {
+	conversations: Array<FormattedConversation> = [new FormattedConversation()];
+	selectedConversation: FormattedConversation = new FormattedConversation();
+	selectedConversationIndex: (index: number) => void = () => {};
+	createConversation: (recipients: string[]) => void = () => {};
+}
 
 const ConversationsContext = createContext<ConversationContent>({
 	conversations: [],
+	selectedConversation: new FormattedConversation(),
 	selectedConversationIndex: () => {},
 	createConversation: () => {},
 });
@@ -57,8 +59,9 @@ export function ConversationsProvider(props: { children: ReactNode }) {
 
 	const value = {
 		conversations: formattedConversations,
-		createConversation,
+		selectedConversation: formattedConversations[selectedConversationIndex],
 		selectedConversationIndex: setSelectedConversationIndex,
+		createConversation,
 	};
 
 	return <ConversationsContext.Provider value={value}>{children}</ConversationsContext.Provider>;
