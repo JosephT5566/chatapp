@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { PREFIX } from '../utils/static';
 
 // useLocalStorage can update the key/value to local storage
+// TODO: add TS generics on hook
 export default function useLocalStorage(key: string, initialValue?: any) {
 	const prefixedKey = PREFIX + key;
 	const [value, setValue] = useState(() => {
