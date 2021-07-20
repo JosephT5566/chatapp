@@ -5,13 +5,20 @@ import ListItemText from '@material-ui/core/ListItemText';
 import { useConversations } from '../../providers/ConversationsProvider';
 
 export default function Conversations() {
-	const { conversations } = useConversations();
+	const { conversations, selectedConversationIndex } = useConversations();
 
 	return (
 		<div>
 			<List component="nav" aria-label="secondary conversations folders">
 				{conversations.map((conversation, index) => (
-					<ListItem button key={index}>
+					<ListItem
+						button
+						key={index}
+						selected={conversation.selected}
+						onClick={() => {
+							selectedConversationIndex(index);
+						}}
+					>
 						<ListItemText primary={conversation.recipients.map((r) => r.name).join(', ')} />
 					</ListItem>
 				))}
