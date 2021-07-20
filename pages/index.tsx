@@ -7,8 +7,9 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { APP_NAME } from '../src/utils/static';
 import Sidebar from '../src/views/payload/sidebar';
-import { ConversationsProvider } from '../src/providers/ConversationsProvider';
+import { ConversationsProvider, useConversations } from '../src/providers/ConversationsProvider';
 import { ContactsProvider } from '../src/providers/ContactsProvider';
+import OpenConversation from '../src/views/layout/openConversation';
 
 const useStyle = makeStyles((theme) => ({
 	home: {
@@ -16,11 +17,15 @@ const useStyle = makeStyles((theme) => ({
 		width: '100%',
 		height: '100vh',
 	},
+	content: {
+		display: 'flex',
+	},
 }));
 
 export default function Home() {
 	const [id, setId] = useLocalStorage('id', uuidv4());
 	const classes = useStyle();
+	const { selectedConversation } = useConversations();
 
 	return (
 		<div className={classes.home}>
@@ -28,10 +33,11 @@ export default function Home() {
 				<title>{APP_NAME}</title>
 			</Head>
 
-			<main>
+			<main className={classes.content}>
 				<ContactsProvider>
-					<ConversationsProvider>
+					<ConversationsProvider id={id}>
 						<Sidebar id={id}></Sidebar>
+						{selectedConversation && <OpenConversation />}
 					</ConversationsProvider>
 				</ContactsProvider>
 			</main>
