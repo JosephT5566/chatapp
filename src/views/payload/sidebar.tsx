@@ -6,6 +6,8 @@ import Dialog from '@material-ui/core/Dialog';
 import Tabs, { TabPanel } from '../../components/shared/Tabs';
 import Conversations from './conversations';
 import Contacts from './contacts';
+import NewContactDialog from './newContactDialog';
+import NewConversationDialog from './newConversationDialog';
 
 const useStyle = makeStyles(() => ({
 	sidebar: {
@@ -55,9 +57,15 @@ export default function Sidebar(props: { id: string }) {
 			<div className={classes.myId}>
 				Your Id: <span>{id}</span>
 			</div>
-			<Button onClick={handleOpenDialog}>New {isConversation ? 'Conversation' : 'Contact'}</Button>
+			<Button onClick={handleOpenDialog} color="primary">
+				New {isConversation ? 'Conversation' : 'Contact'}
+			</Button>
 			<Dialog open={openDialog} onClose={handleCloseDialog}>
-				<div>123</div>
+				{isConversation ? (
+					<NewConversationDialog closeDialog={handleCloseDialog} />
+				) : (
+					<NewContactDialog closeDialog={handleCloseDialog} />
+				)}
 			</Dialog>
 		</div>
 	);
