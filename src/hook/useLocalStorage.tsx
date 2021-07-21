@@ -2,22 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { PREFIX } from '../utils/static';
 
 // useLocalStorage can update the key/value to local storage
-// TODO: add TS generics on hook
-export default function useLocalStorage(key: string, initialValue?: any) {
+export default function useLocalStorage<T>(key: string, initialValue: T): [T, React.Dispatch<React.SetStateAction<T>>] {
 	const prefixedKey = PREFIX + key;
 	const [value, setValue] = useState(() => {
 		// TODO: jsonValue will be 'null' in server side
 		const jsonValue = typeof window !== 'undefined' ? localStorage.getItem(prefixedKey) : null;
 
 		if (jsonValue) {
-			return JSON.parse(jsonValue);
+			return JSON.parse(jsonValue) as T;
 		}
 
-		if (typeof initialValue === 'function') {
-			return initialValue();
-		} else {
-			return initialValue;
-		}
+		return initialValue;
 	});
 
 	useEffect(() => {

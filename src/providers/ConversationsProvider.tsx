@@ -44,13 +44,20 @@ export const useConversations = () => useContext(ConversationsContext);
 
 export function ConversationsProvider(props: { id: string; children: ReactNode }) {
 	const { id, children } = props;
-	const [conversations, setConversations] = useLocalStorage(LOCALSTORAGE_KEY.CONVERSATIONS, []);
+	const [conversations, setConversations] = useLocalStorage(
+		LOCALSTORAGE_KEY.CONVERSATIONS,
+		new Array<Conversation>()
+	);
 	const [selectedConversationIndex, setSelectedConversationIndex] = useState(0);
 	const { contacts } = useContacts();
 
 	// recipients are the id of contacts
 	const createConversation = (recipients: string[]) => {
-		setConversations((prev: any) => [...prev, { recipients, messages: [] }]);
+		setConversations((prev) => {
+			const newConversation: Conversation = new Conversation();
+			const test = [...prev, { ...newConversation, recipients, messages: [] }];
+			return test;
+		});
 	};
 
 	const addMessageToConversation = ({
@@ -62,26 +69,26 @@ export function ConversationsProvider(props: { id: string; children: ReactNode }
 		text: string;
 		sender: string;
 	}) => {
-		setConversations((prevConversations: Array<Conversation>) => {
+		setConversations((prevConversations) => {
 			let isConversationsChange = false;
 			const newMessage = { sender, text };
-			const newConversations = prevConversations.map((conversation) => {
+			const newConversations: Array<Conversation> = prevConversations.map((conversation) => {
 				// check the new message is added to WHICH coversation
 				if (isArrayEqual(conversation.recipients, recipients)) {
 					isConversationsChange = true;
 					return {
 						...conversation,
 						messages: [...conversation.messages, newMessage],
-					};
+					} as Conversation;
 				}
 
 				return conversation;
 			});
 
 			// if the new message is NOT added to existing conversation, create a new conversation
-			const updatedConversations = isConversationsChange
+			const updatedConversations: Array<Conversation> = isConversationsChange
 				? newConversations
-				: [...prevConversations, { recipients, messages: [newMessage] }];
+				: ([...prevConversations, { recipients, messages: [newMessage] }] as Array<Conversation>);
 
 			return updatedConversations;
 		});
