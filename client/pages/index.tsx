@@ -38,7 +38,7 @@ export default function Home() {
 				<SocketProvider id={id}>
 					<ContactsProvider>
 						<ConversationsProvider id={id}>
-							<Sidebar id={id}></Sidebar>
+							<Sidebar id={id} setId={setId}></Sidebar>
 							{selectedConversation && <OpenConversation />}
 						</ConversationsProvider>
 					</ContactsProvider>

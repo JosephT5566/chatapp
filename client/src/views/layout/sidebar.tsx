@@ -8,6 +8,7 @@ import Conversations from '../payload/conversations';
 import Contacts from '../payload/contacts';
 import NewContactDialog from '../payload/newContactDialog';
 import NewConversationDialog from '../payload/newConversationDialog';
+import IdGenerator from '../payload/idGenerator';
 
 const useStyle = makeStyles(() => ({
 	sidebar: {
@@ -28,8 +29,8 @@ const TAB_LABELS = ['Conversation', 'Contact'];
 const CONVERSATION_KEY = 0;
 const CONTACT_KEY = 1;
 
-export default function Sidebar(props: { id: string }) {
-	const { id } = props;
+export default function Sidebar(props: { id: string; setId: any }) {
+	const { id, setId } = props;
 	const classes = useStyle();
 	const [activeKey, setActiveKey] = useState(CONVERSATION_KEY);
 	const [openDialog, setOpenDialog] = useState(false);
@@ -57,6 +58,7 @@ export default function Sidebar(props: { id: string }) {
 			<div className={classes.myId}>
 				Your Id: <span>{id}</span>
 			</div>
+			<IdGenerator setId={setId} />
 			<Button onClick={handleOpenDialog} color="primary">
 				New {isConversation ? 'Conversation' : 'Contact'}
 			</Button>
