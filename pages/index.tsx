@@ -6,7 +6,7 @@ import useLocalStorage from '../src/hook/useLocalStorage';
 import { v4 as uuidv4 } from 'uuid';
 
 import { APP_NAME } from '../src/utils/static';
-import Sidebar from '../src/views/payload/sidebar';
+import Sidebar from '../src/views/layout/sidebar';
 import { ConversationsProvider, useConversations } from '../src/providers/ConversationsProvider';
 import { ContactsProvider } from '../src/providers/ContactsProvider';
 import OpenConversation from '../src/views/layout/openConversation';

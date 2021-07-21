@@ -4,10 +4,10 @@ import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
 
 import Tabs, { TabPanel } from '../../components/shared/Tabs';
-import Conversations from './conversations';
-import Contacts from './contacts';
-import NewContactDialog from './newContactDialog';
-import NewConversationDialog from './newConversationDialog';
+import Conversations from '../payload/conversations';
+import Contacts from '../payload/contacts';
+import NewContactDialog from '../payload/newContactDialog';
+import NewConversationDialog from '../payload/newConversationDialog';
 
 const useStyle = makeStyles(() => ({
 	sidebar: {
