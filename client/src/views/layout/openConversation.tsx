@@ -32,7 +32,9 @@ const useStyle = makeStyles(() => ({
 		margin: '0.3rem 0',
 		display: 'flex',
 		flexDirection: 'column',
+		alignItems: 'flex-start',
 		'&.fromMe': {
+			alignItems: 'flex-end',
 			alignSelf: 'flex-end',
 		},
 
