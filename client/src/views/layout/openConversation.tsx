@@ -39,7 +39,8 @@ const useStyle = makeStyles(() => ({
 		'& .text': {
 			borderRadius: '0.5rem',
 			padding: '0.5rem 1rem',
-			boxShadow: '0 0 0 2px',
+			boxShadow: `0 0 0 1px ${theme.palette.primary.main}`,
+			color: theme.palette.primary.main,
 			'&.fromMe': {
 				boxShadow: 'none',
 				backgroundColor: theme.palette.primary.main,
@@ -49,6 +50,7 @@ const useStyle = makeStyles(() => ({
 		'& .sender': {
 			color: theme.palette.grey[600],
 			fontSize: 'small',
+			marginTop: '0.2rem',
 			'&.fromMe': {
 				textAlign: 'right',
 			},
