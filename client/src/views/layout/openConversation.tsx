@@ -1,14 +1,9 @@
-import React, { useEffect, useState, useRef, useCallback } from 'react';
+import React, { useEffect, useRef, useCallback } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import FormControl from '@material-ui/core/FormControl';
-import Button from '@material-ui/core/Button';
-import Input from '@material-ui/core/Input';
-import OutlinedInput from '@material-ui/core/OutlinedInput';
-import InputAdornment from '@material-ui/core/InputAdornment';
 import { useConversations } from '../../providers/ConversationsProvider';
-import theme from '../../../styles/theme';
+import MessageInput from '../payload/messageInput';
 
-const useStyle = makeStyles(() => ({
+const useStyle = makeStyles((theme) => ({
 	openConversation: {
 		height: '100vh',
 		display: 'flex',
@@ -32,17 +27,14 @@ const useStyle = makeStyles(() => ({
 		margin: '0.3rem 0',
 		display: 'flex',
 		flexDirection: 'column',
-		alignItems: 'flex-start',
 		'&.fromMe': {
-			alignItems: 'flex-end',
 			alignSelf: 'flex-end',
 		},
 
 		'& .text': {
 			borderRadius: '0.5rem',
 			padding: '0.5rem 1rem',
-			boxShadow: `0 0 0 1px ${theme.palette.primary.main}`,
-			color: theme.palette.primary.main,
+			boxShadow: '0 0 0 2px',
 			'&.fromMe': {
 				boxShadow: 'none',
 				backgroundColor: theme.palette.primary.main,
@@ -52,20 +44,15 @@ const useStyle = makeStyles(() => ({
 		'& .sender': {
 			color: theme.palette.grey[600],
 			fontSize: 'small',
-			marginTop: '0.2rem',
 			'&.fromMe': {
 				textAlign: 'right',
 			},
 		},
 	},
-	textInput: {
-		padding: '0.5rem',
-	},
 }));
 
 export default function OpenConversation() {
 	const classes = useStyle();
-	const [text, setText] = useState('');
 	const { sendMessage, selectedConversation } = useConversations();
 	const lastMessageRef = useRef<HTMLInputElement>(null);
 	// const setRef = useCallback((node: React.RefObject<HTMLInputElement>) => {
@@ -73,17 +60,11 @@ export default function OpenConversation() {
 	// 	node && node.current?.scrollIntoView();
 	// }, []);
 
-	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		e.preventDefault();
-		setText(e.target.value);
-	};
-
-	const handleSend = () => {
+	const handleSend = (text: string) => {
 		sendMessage(
 			selectedConversation.recipients.map((r) => r.id),
 			text
 		);
-		setText('');
 	};
 
 	useEffect(() => {
@@ -112,27 +93,7 @@ export default function OpenConversation() {
 						})}
 				</div>
 			</div>
-			<FormControl className={classes.textInput}>
-				<OutlinedInput
-					id="standard-adornment-password"
-					type={'text'}
-					value={text}
-					onChange={handleChange}
-					autoFocus
-					endAdornment={
-						<InputAdornment position="end">
-							<Button
-								color={'primary'}
-								variant={'contained'}
-								aria-label="toggle password visibility"
-								onClick={handleSend}
-							>
-								Send
-							</Button>
-						</InputAdornment>
-					}
-				/>
-			</FormControl>
+			<MessageInput onSendMessage={handleSend} />
 		</div>
 	);
 }
