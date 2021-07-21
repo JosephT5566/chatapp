@@ -1,9 +1,10 @@
-import React, { useContext, createContext, ReactNode, useState } from 'react';
+import React, { useContext, createContext, ReactNode, useState, useEffect, useCallback } from 'react';
 import _ from 'lodash';
 import useLocalStorage from '../hook/useLocalStorage';
 import { useContacts } from './ContactsProvider';
 import { isArrayEqual } from '../utils/helper';
 import { LOCALSTORAGE_KEY } from '../utils/static';
+import { useSocket } from './SocketProvider';
 
 class Recipient {
 	id: string = '';
@@ -50,6 +51,7 @@ export function ConversationsProvider(props: { id: string; children: ReactNode }
 	);
 	const [selectedConversationIndex, setSelectedConversationIndex] = useState(0);
 	const { contacts } = useContacts();
+	const { socket } = useSocket();
 
 	// recipients are the id of contacts
 	const createConversation = (recipients: string[]) => {
@@ -60,41 +62,50 @@ export function ConversationsProvider(props: { id: string; children: ReactNode }
 		});
 	};
 
-	const addMessageToConversation = ({
-		recipients,
-		text,
-		sender,
-	}: {
-		recipients: Array<string>;
-		text: string;
-		sender: string;
-	}) => {
-		setConversations((prevConversations) => {
-			let isConversationsChange = false;
-			const newMessage = { sender, text };
-			const newConversations: Array<Conversation> = prevConversations.map((conversation) => {
-				// check the new message is added to WHICH coversation
-				if (isArrayEqual(conversation.recipients, recipients)) {
-					isConversationsChange = true;
-					return {
-						...conversation,
-						messages: [...conversation.messages, newMessage],
-					} as Conversation;
-				}
+	const addMessageToConversation = useCallback(
+		({ recipients, text, sender }: { recipients: Array<string>; text: string; sender: string }) => {
+			setConversations((prevConversations) => {
+				let isConversationsChange = false;
+				const newMessage = { sender, text };
+				const newConversations: Array<Conversation> = prevConversations.map((conversation) => {
+					// check the new message is added to WHICH coversation
+					if (isArrayEqual(conversation.recipients, recipients)) {
+						isConversationsChange = true;
+						return {
+							...conversation,
+							messages: [...conversation.messages, newMessage],
+						} as Conversation;
+					}
 
-				return conversation;
+					return conversation;
+				});
+
+				// if the new message is NOT added to existing conversation, create a new conversation
+				const updatedConversations: Array<Conversation> = isConversationsChange
+					? newConversations
+					: ([...prevConversations, { recipients, messages: [newMessage] }] as Array<Conversation>);
+
+				return updatedConversations;
 			});
+		},
+		[setConversations]
+	);
 
-			// if the new message is NOT added to existing conversation, create a new conversation
-			const updatedConversations: Array<Conversation> = isConversationsChange
-				? newConversations
-				: ([...prevConversations, { recipients, messages: [newMessage] }] as Array<Conversation>);
+	useEffect(() => {
+		if (!socket) {
+			return;
+		}
 
-			return updatedConversations;
-		});
-	};
+		socket.on('receive-message', addMessageToConversation);
+
+		return () => {
+			socket.off('receive-message');
+		};
+	}, [socket, addMessageToConversation]);
 
 	const sendMessage = (recipients: Array<string>, text: string) => {
+		socket.emit('send-message', { recipients, text });
+
 		addMessageToConversation({ recipients, text, sender: id });
 	};
 
