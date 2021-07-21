@@ -2,6 +2,8 @@ import React, { useContext, createContext, ReactNode, useState } from 'react';
 import _ from 'lodash';
 import useLocalStorage from '../hook/useLocalStorage';
 import { useContacts } from './ContactsProvider';
+import { isArrayEqual } from '../utils/helper';
+import { LOCALSTORAGE_KEY } from '../utils/static';
 
 class Recipient {
 	id: string = '';
@@ -42,7 +44,7 @@ export const useConversations = () => useContext(ConversationsContext);
 
 export function ConversationsProvider(props: { id: string; children: ReactNode }) {
 	const { id, children } = props;
-	const [conversations, setConversations] = useLocalStorage('conversations', []);
+	const [conversations, setConversations] = useLocalStorage(LOCALSTORAGE_KEY.CONVERSATIONS, []);
 	const [selectedConversationIndex, setSelectedConversationIndex] = useState(0);
 	const { contacts } = useContacts();
 
@@ -61,11 +63,12 @@ export function ConversationsProvider(props: { id: string; children: ReactNode }
 		sender: string;
 	}) => {
 		setConversations((prevConversations: Array<Conversation>) => {
-			let madeChange = false;
+			let isConversationsChange = false;
 			const newMessage = { sender, text };
 			const newConversations = prevConversations.map((conversation) => {
-				if (_.isEqual(conversation.recipients.sort(), recipients.sort())) {
-					madeChange = true;
+				// check the new message is added to WHICH coversation
+				if (isArrayEqual(conversation.recipients, recipients)) {
+					isConversationsChange = true;
 					return {
 						...conversation,
 						messages: [...conversation.messages, newMessage],
@@ -75,11 +78,12 @@ export function ConversationsProvider(props: { id: string; children: ReactNode }
 				return conversation;
 			});
 
-			if (madeChange) {
-				return newConversations;
-			} else {
-				return [...prevConversations, { recipients, messages: [newMessage] }];
-			}
+			// if the new message is NOT added to existing conversation, create a new conversation
+			const updatedConversations = isConversationsChange
+				? newConversations
+				: [...prevConversations, { recipients, messages: [newMessage] }];
+
+			return updatedConversations;
 		});
 	};
 

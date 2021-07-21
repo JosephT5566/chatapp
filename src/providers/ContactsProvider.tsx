@@ -1,5 +1,6 @@
 import React, { useContext, createContext, ReactNode } from 'react';
 import useLocalStorage from '../hook/useLocalStorage';
+import { LOCALSTORAGE_KEY } from '../utils/static';
 
 type Contact = {
 	id: string;
@@ -22,7 +23,7 @@ export const useContacts = () => {
 
 export function ContactsProvider(props: { children: ReactNode }) {
 	const { children } = props;
-	const [contacts, setContacts] = useLocalStorage('contacts', []);
+	const [contacts, setContacts] = useLocalStorage(LOCALSTORAGE_KEY.CONTACTS, []);
 
 	const createContact = (id: string, name: string) => {
 		setContacts((prev: any) => [...prev, { id, name }]);

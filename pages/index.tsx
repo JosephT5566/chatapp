@@ -5,7 +5,7 @@ import Container from '@material-ui/core/Container';
 import useLocalStorage from '../src/hook/useLocalStorage';
 import { v4 as uuidv4 } from 'uuid';
 
-import { APP_NAME } from '../src/utils/static';
+import { APP_NAME, LOCALSTORAGE_KEY } from '../src/utils/static';
 import Sidebar from '../src/views/layout/sidebar';
 import { ConversationsProvider, useConversations } from '../src/providers/ConversationsProvider';
 import { ContactsProvider } from '../src/providers/ContactsProvider';
@@ -23,7 +23,7 @@ const useStyle = makeStyles((theme) => ({
 }));
 
 export default function Home() {
-	const [id, setId] = useLocalStorage('id', uuidv4());
+	const [id, setId] = useLocalStorage(LOCALSTORAGE_KEY.USER_ID, uuidv4());
 	const classes = useStyle();
 	const { selectedConversation } = useConversations();
 
