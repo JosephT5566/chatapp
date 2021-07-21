@@ -5,7 +5,7 @@ import ListItemText from '@material-ui/core/ListItemText';
 import { useConversations } from '../../providers/ConversationsProvider';
 
 export default function Conversations() {
-	const { conversations, selectedConversationIndex } = useConversations();
+	const { conversations, setSelectedConversationIndex } = useConversations();
 
 	return (
 		<div>
@@ -16,7 +16,7 @@ export default function Conversations() {
 						key={index}
 						selected={conversation.selected}
 						onClick={() => {
-							selectedConversationIndex(index);
+							setSelectedConversationIndex(index);
 						}}
 					>
 						<ListItemText primary={conversation.recipients.map((r) => r.name).join(', ')} />

@@ -33,7 +33,7 @@ class FormattedConversation {
 export class ConversationContent {
 	conversations: Array<FormattedConversation> = new Array<FormattedConversation>();
 	selectedConversation: FormattedConversation = new FormattedConversation();
-	selectedConversationIndex: (index: number) => void = () => {};
+	setSelectedConversationIndex: (index: number) => void = () => {};
 	sendMessage: (recipients: string[], text: string) => void = () => {};
 	createConversation: (recipients: string[]) => void = () => {};
 }
@@ -112,10 +112,10 @@ export function ConversationsProvider(props: { id: string; children: ReactNode }
 		}
 	);
 
-	const value = {
+	const value: ConversationContent = {
 		conversations: formattedConversations,
 		selectedConversation: formattedConversations[selectedConversationIndex],
-		selectedConversationIndex: setSelectedConversationIndex,
+		setSelectedConversationIndex,
 		sendMessage,
 		createConversation,
 	};
