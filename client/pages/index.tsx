@@ -10,6 +10,7 @@ import Sidebar from '../src/views/layout/sidebar';
 import { ConversationsProvider, useConversations } from '../src/providers/ConversationsProvider';
 import { ContactsProvider } from '../src/providers/ContactsProvider';
 import OpenConversation from '../src/views/layout/openConversation';
+import SocketProvider from '../src/providers/SocketProvider';
 
 const useStyle = makeStyles((theme) => ({
 	home: {
@@ -34,12 +35,14 @@ export default function Home() {
 			</Head>
 
 			<main className={classes.content}>
-				<ContactsProvider>
-					<ConversationsProvider id={id}>
-						<Sidebar id={id}></Sidebar>
-						{selectedConversation && <OpenConversation />}
-					</ConversationsProvider>
-				</ContactsProvider>
+				<SocketProvider id={id}>
+					<ContactsProvider>
+						<ConversationsProvider id={id}>
+							<Sidebar id={id}></Sidebar>
+							{selectedConversation && <OpenConversation />}
+						</ConversationsProvider>
+					</ContactsProvider>
+				</SocketProvider>
 			</main>
 		</div>
 	);
