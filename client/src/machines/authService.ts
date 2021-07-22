@@ -1,13 +1,14 @@
-import { createMachine, interpret, assign } from 'xstate';
-import { useActor, useInterpret } from '@xstate/react';
+import { createMachine, assign } from 'xstate';
 import { User } from '../types/users';
 import { toBase64 } from '../utils/encoding';
 // import { API_ENDPOINT } from '../config'
 
-export interface CredentialStore {
-	loadAuthAsync: () => Promise<AuthState>;
-	saveAuthAsync: (value: AuthState) => Promise<void>;
-	clearAuthAsync: () => Promise<void>;
+export class CredentialStore {
+	loadAuthAsync: () => Promise<AuthState> = async () => {
+		throw new Error('stub storage has no values');
+	};
+	saveAuthAsync: (value: AuthState) => Promise<void> = async (_value: AuthState) => {};
+	clearAuthAsync: () => Promise<void> = async (): Promise<void> => {};
 }
 
 export interface AuthState {
@@ -23,7 +24,7 @@ interface Context {
 
 type Event =
 	| { type: 'LOAD_AUTH' }
-	| { type: 'LOGIN'; account: string; password: string }
+	| { type: 'LOGIN'; id: string; username: string }
 	| { type: 'SIGNUP_LOGIN'; auth: AuthState }
 	| { type: 'LOGOUT' }
 	| { type: 'REFRESH' };
@@ -67,17 +68,11 @@ type State =
 
 // Initialize a stub store, allowing an explicit replacement
 // by default, this will do nothing but throw when loading
-var store: CredentialStore = {
-	loadAuthAsync: async () => {
-		throw new Error('stub storage has no values');
-	},
-	saveAuthAsync: async (_value: AuthState) => {},
-	clearAuthAsync: async (): Promise<void> => {},
-};
+let store = new CredentialStore();
 
 let signoutCallback: () => void = () => {};
 
-const authMachine = createMachine<Context, Event, State>(
+export const authMachine = createMachine<Context, Event, State>(
 	{
 		id: 'auth',
 		initial: 'LOGGED_OUT',
@@ -230,22 +225,7 @@ async function loadStoredAuth() {
 
 async function refreshJWT() {
 	try {
-		let auth = await store.loadAuthAsync();
-		const resp = await fetch(`${API_ENDPOINT}/web/auth/refresh`, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({
-				id: auth.user.id,
-				token: auth.refreshToken,
-			}),
-			credentials: 'include',
-		});
-		if (!resp.ok) {
-			throw Error(`refresh failed: ${resp.status}`);
-		}
-		const authState: AuthState = await resp.json();
-		authState.user.id = authState.user.id.toString();
-		store.saveAuthAsync(authState);
+		let authState = await store.loadAuthAsync();
 		return authState;
 	} catch (e) {
 		throw Error(`refresh failed: ${e}`);
@@ -256,27 +236,16 @@ async function signIn(event: Event) {
 	console.log('EVENT', event);
 	switch (event.type) {
 		case 'LOGIN':
-			const basic = createBasicAuth(event.account, event.password);
-			const resp = await fetch(`${API_ENDPOINT}/web/auth/login`, {
-				method: 'POST',
-				headers: {
-					Authorization: basic,
-				},
-				credentials: 'include',
-			});
-			if (!resp.ok) {
-				throw Error('login failed');
-			}
 			// #HACK: Type casting only for compile-time, need to manually do it at runtime
-			const authState: AuthState = await resp
-				.json()
-				.then((data) => {
-					data.user.id = data.user.id.toString();
-					return data as AuthState;
-				})
-				.catch((e) => {
-					throw Error(`login failed: ${e.message}`);
-				});
+			const authState: AuthState = {
+				user: {
+					__typename: 'User',
+					id: event.id,
+					username: '',
+				},
+				jwt: '',
+				refreshToken: '',
+			};
 			store.saveAuthAsync(authState);
 			return authState;
 		default:
@@ -288,19 +257,21 @@ const createBasicAuth = (login: string, pwd: string): string => {
 	return 'Basic ' + toBase64(`${login}:${pwd}`);
 };
 
-const getCurrentJwt = (): string | undefined => {
-	return authService.state.context.values?.jwt;
+// const getCurrentJwt = (): string | undefined => {
+// 	return authService.state.context.values?.jwt;
+// };
+
+const setStore = (newStore: CredentialStore) => {
+	store = newStore;
 };
 
-const initStoreAndLoad = (newStore: CredentialStore) => {
-	store = newStore;
-	authService.send('LOAD_AUTH');
-};
+// const initStoreAndLoad = (newStore: CredentialStore) => {
+// 	store = newStore;
+// 	authService.send('LOAD_AUTH');
+// };
 
 const setSignoutCallback = (cb: () => void) => {
 	signoutCallback = cb;
 };
 
-const authService = useInterpret(authMachine);
-export const useAuthServiceActor = () => useActor(authService);
-export { getCurrentJwt, initStoreAndLoad, setSignoutCallback };
+export { setStore, setSignoutCallback };
