@@ -38,6 +38,13 @@ type Event =
 
 type State =
 	| {
+			value: 'IDLE';
+			context: Context & {
+				values: undefined;
+				error: undefined;
+			};
+	  }
+	| {
 			value: 'LOADING_STORED_AUTH';
 			context: Context & {
 				values: undefined;
@@ -82,12 +89,17 @@ let signoutCallback: () => void = () => {};
 export const authMachine = createMachine<Context, Event, State>(
 	{
 		id: 'auth',
-		initial: 'LOGGED_OUT',
+		initial: 'IDLE',
 		context: {
 			values: undefined,
 			error: undefined,
 		},
 		states: {
+			IDLE: {
+				on: {
+					LOAD_AUTH: 'LOADING_STORED_AUTH',
+				},
+			},
 			LOADING_STORED_AUTH: {
 				invoke: {
 					id: 'loadAuth',
@@ -162,7 +174,6 @@ export const authMachine = createMachine<Context, Event, State>(
 					},
 
 					LOGIN: 'SIGNING_IN',
-					LOAD_AUTH: 'LOADING_STORED_AUTH',
 				},
 			},
 			SIGNING_IN: {
