@@ -1,16 +1,16 @@
 import Head from 'next/head';
 import Image from 'next/image';
 import { makeStyles } from '@material-ui/core';
-import Container from '@material-ui/core/Container';
-import useLocalStorage from '../src/hook/useLocalStorage';
-import { v4 as uuidv4 } from 'uuid';
+import { useActor } from '@xstate/react';
 
-import { APP_NAME, LOCALSTORAGE_KEY } from '../src/utils/static';
+import { APP_NAME } from '../src/utils/static';
 import Sidebar from '../src/views/layout/sidebar';
 import { ConversationsProvider, useConversations } from '../src/providers/ConversationsProvider';
 import { ContactsProvider } from '../src/providers/ContactsProvider';
 import OpenConversation from '../src/views/layout/openConversation';
 import SocketProvider from '../src/providers/SocketProvider';
+import { useAuthServiceValue } from '../src/providers/AuthServiceProvider';
+import { withAuth } from '../src/hocs/withAuth';
 
 const useStyle = makeStyles((theme) => ({
 	home: {
@@ -23,10 +23,11 @@ const useStyle = makeStyles((theme) => ({
 	},
 }));
 
-export default function Home() {
-	const [id, setId] = useLocalStorage(LOCALSTORAGE_KEY.USER_ID, uuidv4());
+function Home() {
 	const classes = useStyle();
 	const { selectedConversation } = useConversations();
+	const [state] = useActor(useAuthServiceValue().authService);
+	const id = state.context.values?.user.id as string;
 
 	return (
 		<div className={classes.home}>
@@ -38,7 +39,7 @@ export default function Home() {
 				<SocketProvider id={id}>
 					<ContactsProvider>
 						<ConversationsProvider id={id}>
-							<Sidebar id={id} setId={setId}></Sidebar>
+							<Sidebar id={id}></Sidebar>
 							{selectedConversation && <OpenConversation />}
 						</ConversationsProvider>
 					</ContactsProvider>
@@ -47,3 +48,5 @@ export default function Home() {
 		</div>
 	);
 }
+
+export default withAuth(Home);

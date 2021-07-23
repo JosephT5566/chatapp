@@ -2,15 +2,17 @@ import React, { useContext, createContext, ReactNode } from 'react';
 import useLocalStorage from '../hook/useLocalStorage';
 import { LOCALSTORAGE_KEY } from '../utils/static';
 
-type Contact = {
+interface Contact {
 	id: string;
 	name: string;
-};
+}
 
-export type ContactContent = {
+// interface IContacts extends Array<Contact> {}
+
+export interface ContactContent {
 	contacts: Array<Contact>;
 	createContact: (id: string, name: string) => void;
-};
+}
 
 const ContactsContext = createContext<ContactContent>({
 	contacts: [],
