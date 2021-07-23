@@ -24,8 +24,15 @@ interface Context {
 
 type Event =
 	| { type: 'LOAD_AUTH' }
-	| { type: 'LOGIN'; id: string; username: string }
-	| { type: 'SIGNUP_LOGIN'; auth: AuthState }
+	| {
+			type: 'LOGIN';
+			id: string;
+			username: string;
+	  }
+	| {
+			type: 'SIGNUP_LOGIN';
+			auth: AuthState;
+	  }
 	| { type: 'LOGOUT' }
 	| { type: 'REFRESH' };
 
@@ -264,11 +271,6 @@ const createBasicAuth = (login: string, pwd: string): string => {
 const setStore = (newStore: CredentialStore) => {
 	store = newStore;
 };
-
-// const initStoreAndLoad = (newStore: CredentialStore) => {
-// 	store = newStore;
-// 	authService.send('LOAD_AUTH');
-// };
 
 const setSignoutCallback = (cb: () => void) => {
 	signoutCallback = cb;
