@@ -24,12 +24,26 @@ interface Context {
 
 type Event =
 	| { type: 'LOAD_AUTH' }
-	| { type: 'LOGIN'; id: string; username: string }
-	| { type: 'SIGNUP_LOGIN'; auth: AuthState }
+	| {
+			type: 'LOGIN';
+			id: string;
+			username: string;
+	  }
+	| {
+			type: 'SIGNUP_LOGIN';
+			auth: AuthState;
+	  }
 	| { type: 'LOGOUT' }
 	| { type: 'REFRESH' };
 
 type State =
+	| {
+			value: 'IDLE';
+			context: Context & {
+				values: undefined;
+				error: undefined;
+			};
+	  }
 	| {
 			value: 'LOADING_STORED_AUTH';
 			context: Context & {
@@ -75,12 +89,17 @@ let signoutCallback: () => void = () => {};
 export const authMachine = createMachine<Context, Event, State>(
 	{
 		id: 'auth',
-		initial: 'LOGGED_OUT',
+		initial: 'IDLE',
 		context: {
 			values: undefined,
 			error: undefined,
 		},
 		states: {
+			IDLE: {
+				on: {
+					LOAD_AUTH: 'LOADING_STORED_AUTH',
+				},
+			},
 			LOADING_STORED_AUTH: {
 				invoke: {
 					id: 'loadAuth',
@@ -155,7 +174,6 @@ export const authMachine = createMachine<Context, Event, State>(
 					},
 
 					LOGIN: 'SIGNING_IN',
-					LOAD_AUTH: 'LOADING_STORED_AUTH',
 				},
 			},
 			SIGNING_IN: {
@@ -264,11 +282,6 @@ const createBasicAuth = (login: string, pwd: string): string => {
 const setStore = (newStore: CredentialStore) => {
 	store = newStore;
 };
-
-// const initStoreAndLoad = (newStore: CredentialStore) => {
-// 	store = newStore;
-// 	authService.send('LOAD_AUTH');
-// };
 
 const setSignoutCallback = (cb: () => void) => {
 	signoutCallback = cb;
